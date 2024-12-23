@@ -33,6 +33,7 @@ class Player():
         self.strike = False
         self.walk_attack_R = False
         self.walk_attack_L = False
+        self.space_clicked = False
 
 
 
@@ -55,6 +56,7 @@ class Player():
         self.death_index = 0
 
     def update(self):
+        self.moving = False
         keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT] and self.position[0] >= 0:
             self.position[0] -= SPRITE_SPEED
@@ -62,13 +64,14 @@ class Player():
         if keys[pygame.K_RIGHT] and self.position[0] <= WIDTH - SPRITE_WIDTH:
             self.position[0] += SPRITE_SPEED
             self.moving = True
-        if keys[pygame.K_1]:
+        if keys[pygame.K_1] and not self.attacking and not keys[pygame.K_RIGHT] and not keys[pygame.K_LEFT]:
             self.start_attacking()
-        if keys[pygame.K_1] and keys[pygame.K_RIGHT] and not self.attacking and self.position[0] <= WIDTH - SPRITE_WIDTH:
+        if keys[pygame.K_1] and keys[pygame.K_RIGHT] and not self.attacking and self.position[0] <= WIDTH - SPRITE_WIDTH and not self.walk_attack_R:
             self.start_walk_attacking_R()
-        if keys[pygame.K_1] and keys[pygame.K_LEFT]:
+        if keys[pygame.K_1] and keys[pygame.K_LEFT] and not self.attacking and self.position[0] >= 0 + SPRITE_WIDTH and not self.walk_attack_L:
             self.start_walk_attacking_L()
-        if keys[pygame.K_SPACE]:
+        if keys[pygame.K_SPACE] and not self.space_clicked:
+            self.space_clicked = True
             self.start_jumping()
         if keys[pygame.K_2]:
             self.die()
@@ -83,6 +86,7 @@ class Player():
             elif self.jumping_index == JUMP_FRAMES:
                 self.jumping_index = 0
                 self.jumping = False
+                self.space_clicked = False
 
         if self.attacking and not self.moving:
             if self.attacking_index < 6:
@@ -92,14 +96,18 @@ class Player():
                     self.strike = True
                 else:
                     self.strike = False
-            self.attacking_index = 0
-            self.attacking = False
+                self.attacking_index = 0
+                self.attacking = False
 
         if self.walk_attack_R:
             if self.walk_attack_index < 6:
                 self.position[0] += 1
                 self.walk_attack_index += 1
             else:
+                if not self.strike:
+                    self.strike = True
+                else:
+                    self.strike = False               
                 self.walk_attack_index = 0
                 self.walk_attack_R = False
 
@@ -108,6 +116,10 @@ class Player():
                 self.position[0] -= 1
                 self.walk_attack_index += 1
             else:
+                if not self.strike:
+                    self.strike = True
+                else:
+                    self.strike = False                      
                 self.walk_attack_index = 0
                 self.walk_attack_L = False
 
