@@ -25,7 +25,7 @@ while True: # Main loop
 
   #Blits:
   player.update()
-  enemy.update()
+  enemy.update(player.position)
   screen.blit(main_surface, (0, 0))
   screen.blit(main_ground, (0, HEIGHT - 130))
   player.draw(screen)
