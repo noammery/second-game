@@ -56,6 +56,7 @@ class Player():
         self.hit = False
         self.direction = True #True - right, False - left 
         self.block = False  
+        
 
 
     def start_jumping(self):
@@ -173,10 +174,10 @@ class Player():
         return pygame.Rect(self.position[0] + SPRITE_WIDTH / 2, self.position[1], SPRITE_WIDTH, SPRITE_HEIGHT * SCALE_FACTOR)
     
     def got_hit(self):
-        if not self.hit and not self.block:  
-             self.hit = True
-             self.life -= 1
-             pygame.time.set_timer(pygame.USEREVENT + 1, 500)  
+        if not self.hit and not self.block:
+            self.hit = True
+            self.life -= 1
+            pygame.time.set_timer(pygame.USEREVENT + 1, 500)  # Cooldown 
 
     def draw(self, screen, FONT):
         if self.attacking and not self.moving and not self.death:
