@@ -52,7 +52,7 @@ class Player():
         self.walk_attack_R = False
         self.walk_attack_L = False
         self.space_clicked = False
-        self.life = 2
+        self.life = 10
         self.hit = False
         self.direction = True #True - right, False - left 
         self.block = False  
@@ -223,7 +223,7 @@ class Player():
                 exit()
 
         self.moving_index = (self.moving_index + 1) % len(self.walk_frames)
-        player_life = FONT.render(f"Life: {self.life}", 1, "red")
+        player_life = FONT.render(f"Life: {self.life}", 1, "black")
         screen.blit(player_life, (10, 10))
 
 

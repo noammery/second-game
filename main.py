@@ -27,10 +27,13 @@ while True: # Main loop
       exit()
     if event.type == pygame.USEREVENT + 1:
       player.hit = False 
+      enemy.hit = False
   
 
   if player.get_rect().colliderect(enemy.get_rect()) and enemy.attack and not player.hit:
     player.got_hit()
+  if player.get_rect().colliderect(enemy.get_rect()) and (player.attacking or player.walk_attack_R or player.walk_attack_L) and not enemy.hit:
+    enemy.got_hit()
 
 
   #Blits:
@@ -39,7 +42,7 @@ while True: # Main loop
   screen.blit(main_surface, (0, 0))
   screen.blit(main_ground, (0, HEIGHT - 130))
   player.draw(screen,FONT)
-  enemy.draw(screen)
+  enemy.draw(screen,FONT)
 
   # Update the frame index
   pygame.display.update()
