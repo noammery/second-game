@@ -2,6 +2,7 @@ import pygame
 from settings import SPRITE_WIDTH, SPRITE_HEIGHT, SCALE_FACTOR, WIDTH, SPRITE_SPEED, JUMP_FRAMES
 from utils import get_frame
 import random
+import time
 
 class Enemy:
   def __init__(self, x, y):
@@ -15,12 +16,17 @@ class Enemy:
     self.walk_attacking = False
     self.moving = False
     self.moving_index = 0
+    self.speed = 5
     self.walk_attack_index = 0
     self.alive = True
     self.attack_colldown = 1
     self.attack = False
     self.strike = False
     self.facing_left = True
+    self.change_direction_coll = random.randint(5,10)
+    self.surprise_attack_coll = 10 
+    self.attack_direction = True
+    self.surprise_attacking = False
 
 
   def start_attacking(self):
@@ -29,17 +35,17 @@ class Enemy:
   def update(self,player_position):
     x_delta = self.position[0] - player_position[0]
     if x_delta > 0: 
-        self.facing_left = True
+        self.attack_direction = True
     else: 
-        self.facing_left = False
+        self.attack_direction = False
         
 
-    if self.facing_left and player_position[0] + (SPRITE_WIDTH / 1.5) < self.position[0] < WIDTH - SPRITE_WIDTH:
+    if self.facing_left and SPRITE_WIDTH  < self.position[0] < WIDTH - SPRITE_WIDTH:
       self.moving = True
-      self.position[0] -= 5
-    elif not self.facing_left and player_position[0] > self.position[0] > SPRITE_WIDTH:
+      self.position[0] -= self.speed
+    elif not self.facing_left and WIDTH - SPRITE_WIDTH > self.position[0] > SPRITE_WIDTH:
       self.moving = True
-      self.position[0] += 5
+      self.position[0] += self.speed
     else:
       self.moving = False
       self.moving_index = 0
@@ -78,20 +84,36 @@ class Enemy:
     # Handle cooldown
     if self.attack_colldown > 0:
       self.attack_colldown -= 1
+    
+    if self.change_direction_coll <= 0 and not self.surprise_attacking:
+      if self.facing_left:
+        self.facing_left = False
+      else:
+        self.facing_left = True
+      self.change_direction_coll = random.randint(2,10)
 
+    if self.surprise_attack_coll <= 0:
+      self.surprise_attacking = True
+      self.facing_left = self.attack_direction
+      self.speed = 10
+      if abs(self.position[0] - player_position[0]) < 10:
+        self.surprise_attacking = False
+        self.speed = 5
+        self.surprise_attack_coll = random.randint(5,10)
+
+    
+    if self.change_direction_coll > 0:
+      self.change_direction_coll -=0.1
+
+    if self.surprise_attack_coll > 0:
+      self.surprise_attack_coll -=0.1
+
+      
   def get_rect(self):
     return pygame.Rect(self.position[0], self.position[1], SPRITE_WIDTH, SPRITE_HEIGHT * SCALE_FACTOR)
   
   
-  def draw(self, screen, player_position):
-    if player_position[0] - self.position[0] < 0:
-      relevant_walk_sheet = self.walk_sheet_flipped
-      relevant_walk_attack1_sheet = self.walk_attack1_sheet_flipped 
-      relevant_walk_attack2_sheet = self.walk_attack2_sheet_flipped
-    else:
-      relevant_walk_sheet = self.walk_sheet
-      relevant_walk_attack1_sheet = self.walk_attack1_sheet
-      relevant_walk_attack2_sheet = self.walk_attack2_sheet
+  def draw(self, screen):
     if self.moving and not self.attack:
       screen.blit(self.walk_frames[self.moving_index - 1], self.position)
     elif not self.moving and not self.attack:
@@ -102,7 +124,6 @@ class Enemy:
       else:
         screen.blit(self.walk_attack2_frames[self.walk_attack_index % 6], self.position)
 
-    pygame.draw.rect(screen, (0, 255, 0), self.get_rect(), 1)  # Red color, width=1
     
   
 

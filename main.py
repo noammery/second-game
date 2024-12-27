@@ -12,6 +12,7 @@ main_surface = pygame.transform.scale(pygame.image.load("assets/Backgrounds/Sky.
 main_ground = pygame.transform.scale(pygame.image.load("assets/Backgrounds/Ground.jpg"),(WIDTH, 130)).convert()
 
 
+
 FONT = pygame.font.SysFont("comicsans", 20)
 
 player = Player(x=100, y=FLOOR - 50)
@@ -26,10 +27,10 @@ while True: # Main loop
       exit()
     if event.type == pygame.USEREVENT + 1:
       player.hit = False 
-    
+  
+
   if player.get_rect().colliderect(enemy.get_rect()) and enemy.attack and not player.hit:
     player.got_hit()
-    print("hit")
 
 
   #Blits:
@@ -38,7 +39,7 @@ while True: # Main loop
   screen.blit(main_surface, (0, 0))
   screen.blit(main_ground, (0, HEIGHT - 130))
   player.draw(screen,FONT)
-  enemy.draw(screen, player.position)
+  enemy.draw(screen)
 
   # Update the frame index
   pygame.display.update()

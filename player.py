@@ -13,12 +13,14 @@ class Player():
         self.attack1_sheet = pygame.image.load("assets/Player/Attack1.png").convert_alpha()
         self.attack2_sheet = pygame.image.load("assets/Player/Attack2.png").convert_alpha()
         self.death_sheet = pygame.image.load("assets/Player/Death.png").convert_alpha()
+        self.block_sheet = pygame.image.load("assets/Player/Squat.png").convert_alpha()
         self.walk_sheet_flipped = pygame.transform.flip(self.walk_sheet, True, False)
         self.attack1_sheet_flipped = pygame.transform.flip(self.attack1_sheet, True, False)
         self.attack2_sheet_flipped = pygame.transform.flip(self.attack2_sheet, True, False)
         self.walk_attack1_sheet_flipped = pygame.transform.flip(self.walk_attack1_sheet, True, False)
         self.walk_attack2_sheet_flipped = pygame.transform.flip(self.walk_attack2_sheet, True, False)
         self.jump_sheet_flipped = pygame.transform.flip(self.jump_sheet, True, False)
+        self.block_sheet_flipped = pygame.transform.flip(self.block_sheet, True, False)
         self.walk_frames = [get_frame(self.walk_sheet, i, SPRITE_WIDTH, SPRITE_HEIGHT, SCALE_FACTOR) for i in range(6)]
         self.jump_frames = [get_frame(self.jump_sheet, i, SPRITE_WIDTH, SPRITE_HEIGHT, SCALE_FACTOR) for i in range(6)]
         self.attack1_frames = [get_frame(self.attack1_sheet, i, SPRITE_WIDTH, SPRITE_HEIGHT, SCALE_FACTOR) for i in range(6)]
@@ -26,17 +28,20 @@ class Player():
         self.walk_attack1_frames = [get_frame(self.walk_attack1_sheet, i, SPRITE_WIDTH, SPRITE_HEIGHT, SCALE_FACTOR) for i in range(6)]
         self.walk_attack2_frames = [get_frame(self.walk_attack2_sheet, i, SPRITE_WIDTH, SPRITE_HEIGHT, SCALE_FACTOR) for i in range(6)]
         self.death_frames = [get_frame(self.death_sheet, i, SPRITE_WIDTH, SPRITE_HEIGHT, SCALE_FACTOR) for i in range(6)]
+        self.block_frames = [get_frame(self.block_sheet, i, SPRITE_WIDTH, SPRITE_HEIGHT, SCALE_FACTOR) for i in range(4)]
         self.walk_frames_flipped = [get_frame(self.walk_sheet_flipped, i, SPRITE_WIDTH, SPRITE_HEIGHT, SCALE_FACTOR) for i in range(6)]
         self.attack1_frames_flipped = [get_frame(self.attack1_sheet_flipped, i, SPRITE_WIDTH, SPRITE_HEIGHT, SCALE_FACTOR) for i in range(6)]
         self.attack2_frames_flipped = [get_frame(self.attack2_sheet_flipped, i, SPRITE_WIDTH, SPRITE_HEIGHT, SCALE_FACTOR) for i in range(6)]
         self.walk_attack1_frames_flipped = [get_frame(self.walk_attack1_sheet_flipped, i, SPRITE_WIDTH, SPRITE_HEIGHT, SCALE_FACTOR) for i in range(6)]
         self.walk_attack2_frames_flipped = [get_frame(self.walk_attack2_sheet_flipped, i, SPRITE_WIDTH, SPRITE_HEIGHT, SCALE_FACTOR) for i in range(6)]
         self.jump_frames_flipped = [get_frame(self.jump_sheet_flipped, i, SPRITE_WIDTH, SPRITE_HEIGHT, SCALE_FACTOR) for i in range(6)]
+        self.block_frames_flipped = [get_frame(self.block_sheet_flipped, i, SPRITE_WIDTH, SPRITE_HEIGHT, SCALE_FACTOR) for i in range(4)]
         
         self.moving_index = 0
         self.attacking_index = 0
         self.jumping_index = 0
         self.death_index = 0
+        self.block_index = 0
         self.walk_attack_index = 0
         self.frame_index = 0
         self.moving = False 
@@ -50,6 +55,7 @@ class Player():
         self.life = 2
         self.hit = False
         self.direction = True #True - right, False - left 
+        self.block = False  
 
 
     def start_jumping(self):
@@ -87,6 +93,10 @@ class Player():
         if keys[pygame.K_SPACE] and not self.space_clicked:
             self.space_clicked = True
             self.start_jumping()
+        if keys[pygame.K_2] and not self.attacking and not self.moving:
+            self.block = True
+        else:
+            self.block = False
         if self.life == 0:
             self.death = True
         
@@ -104,7 +114,7 @@ class Player():
                 self.jumping = False
                 self.space_clicked = False
 
-        if self.attacking and not self.moving:
+        if self.attacking and not self.moving and not self.block:
             if self.attacking_index < 6:
                 self.attacking_index += 1
             else:
@@ -115,7 +125,7 @@ class Player():
                 self.attacking_index = 0
                 self.attacking = False
 
-        if self.walk_attack_R:
+        if self.walk_attack_R and not self.block:
             if self.walk_attack_index < 6:
                 self.position[0] += 1
                 self.walk_attack_index += 1
@@ -127,7 +137,7 @@ class Player():
                 self.walk_attack_index = 0
                 self.walk_attack_R = False
 
-        if self.walk_attack_L:
+        if self.walk_attack_L and not self.block:
             if self.walk_attack_index < 6:
                 self.position[0] -= 1
                 self.walk_attack_index += 1
@@ -138,6 +148,14 @@ class Player():
                     self.strike = False                      
                 self.walk_attack_index = 0
                 self.walk_attack_L = False
+
+        if self.block:
+            if self.block_index < 4:
+                self.block_index += 1
+        else:
+            if self.block_index > 0:
+                self.block_index -= 1
+
         
         if self.death:
             self.death_index += 1
@@ -148,13 +166,14 @@ class Player():
         else:
             self.frame_index = 0
         
+        
 
 
     def get_rect(self):
         return pygame.Rect(self.position[0] + SPRITE_WIDTH / 2, self.position[1], SPRITE_WIDTH, SPRITE_HEIGHT * SCALE_FACTOR)
     
     def got_hit(self):
-        if not self.hit:  
+        if not self.hit and not self.block:  
              self.hit = True
              self.life -= 1
              pygame.time.set_timer(pygame.USEREVENT + 1, 500)  
@@ -186,6 +205,11 @@ class Player():
                 screen.blit(self.walk_attack1_frames_flipped[self.walk_attack_index % 6], self.position)
             else:
                 screen.blit(self.walk_attack2_frames_flipped[self.walk_attack_index % 6], self.position)
+        elif self.block_index > 0 and not self.death:
+            if self.direction:
+                screen.blit(self.block_frames[self.block_index - 1], self.position)
+            else:
+                screen.blit(self.block_frames_flipped[abs(4-self.block_index)], self.position)
         elif not self.death:
             if self.direction:
                 screen.blit(self.walk_frames[self.frame_index], self.position)
@@ -199,8 +223,6 @@ class Player():
                 exit()
 
         self.moving_index = (self.moving_index + 1) % len(self.walk_frames)
-
-        pygame.draw.rect(screen, (255, 0, 0), self.get_rect(), 1)  # Red color, width=1
         player_life = FONT.render(f"Life: {self.life}", 1, "red")
         screen.blit(player_life, (10, 10))
 
