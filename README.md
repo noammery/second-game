@@ -19,9 +19,6 @@ Welcome to our **Side-Scrolling Adventure Game**, a fun and exciting game with s
 - **Character Sprites:** High-quality and detailed animations for your character.
 - **Adjustable Graphics:** Works well on different screen sizes thanks to built-in scaling.
 
-### 🎶 Great Sound Effects
-- Enjoy sound effects that make the game more fun and engaging.
-
 ---
 
 ## Controls
@@ -34,7 +31,6 @@ Welcome to our **Side-Scrolling Adventure Game**, a fun and exciting game with s
 | `1`                  | Attack                       |
 | `1` + `Arrow Right`  | Attack while moving right    |
 | `1` + `Arrow Left`   | Attack while moving left     |
-| `2`                  | Trigger Death Animation      |
 
 ---
 
@@ -69,7 +65,7 @@ The game uses a custom function to break sprites into frames, creating smooth an
 - **Enemy AI:** Add smart enemies that challenge you.
 - **Power-ups:** Collect items to improve your skills.
 - **New Levels:** Turn the game into a multi-level adventure.
-
+- **Great Sound Effects:** 🎶 Add sounds effects to make the game much more exciting!
 ---
 
 ## Thanks!
@@ -79,7 +75,7 @@ The game uses a custom function to break sprites into frames, creating smooth an
 ---
 
 ## Want to Help?
-If you’d like to improve the game or add your own ideas, feel free to fork the repository and submit a pull request. We’d love to see your contributions!
+Please contanct me Here or at my LinkdIn.
 
 ---
 
@@ -88,5 +84,5 @@ This project is open-source and available under the MIT License.
 
 ---
 
-Enjoy the game! Let us know what you think or if you find any issues. Let’s make it even better together!
+Enjoy the game! Let us know what you think or if you find any issues.
 
