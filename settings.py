@@ -10,3 +10,4 @@ ENEMY_SPEED = 5
 SCALE_FACTOR = 2
 JUMP_HEIGHT = 10  # Maximum height the player will jump
 JUMP_FRAMES = 6  # Number of frames in the jump animation
+GRAVITY = 10

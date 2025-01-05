@@ -1,5 +1,5 @@
 import pygame
-from settings import SPRITE_WIDTH, SPRITE_HEIGHT, SCALE_FACTOR, WIDTH, SPRITE_SPEED, JUMP_FRAMES
+from settings import SPRITE_WIDTH, SPRITE_HEIGHT, SCALE_FACTOR, WIDTH, SPRITE_SPEED, JUMP_FRAMES, FLOOR, GRAVITY
 from utils import get_frame
 
 class Player():
@@ -56,6 +56,10 @@ class Player():
         self.hit = False
         self.direction = True #True - right, False - left 
         self.block = False  
+        self.current_floor = FLOOR
+        self.on_terrain = False
+        self.falling = False
+        self.was_on_terrain = self.on_terrain
         
 
 
@@ -105,12 +109,13 @@ class Player():
 
         if self.jumping:
             if self.jumping_index < JUMP_FRAMES // 2:
-                self.position[1] -= 10
+                self.position[1] -= 40
                 self.jumping_index += 1
-            elif JUMP_FRAMES // 2 <= self.jumping_index < JUMP_FRAMES:
-                self.position[1] += 10
+            elif JUMP_FRAMES // 2 <= self.jumping_index < JUMP_FRAMES and self.position[1] <= (self.current_floor - 40 - SPRITE_HEIGHT):
+                self.position[1] += 40
                 self.jumping_index += 1
-            elif self.jumping_index == JUMP_FRAMES:
+            elif self.jumping_index == JUMP_FRAMES or (self.position[1] >= (self.current_floor - 40 - SPRITE_HEIGHT)):
+                self.position[1] = self.current_floor - SPRITE_HEIGHT
                 self.jumping_index = 0
                 self.jumping = False
                 self.space_clicked = False
@@ -166,12 +171,33 @@ class Player():
             self.frame_index = (self.frame_index + 1) % len(self.walk_frames)
         else:
             self.frame_index = 0
-        
-        
+
+        # If not on terrain, default to falling
+        if not self.on_terrain:
+            self.current_floor = FLOOR
+
+        # Determine if falling
+        if self.position[1] < self.current_floor - SPRITE_HEIGHT and not self.jumping:
+            self.falling = True
+        else:
+            self.falling = False
+
+        # Apply gravity if falling
+        if self.falling and not self.jumping:
+            self.position[1] += GRAVITY
+
+        # Ensure the player doesn't fall below the floor
+        if self.position[1] + SPRITE_HEIGHT > FLOOR:
+            self.position[1] = FLOOR - SPRITE_HEIGHT
+            self.falling = False
+
 
 
     def get_rect(self):
-        return pygame.Rect(self.position[0] + SPRITE_WIDTH / 2, self.position[1], SPRITE_WIDTH, SPRITE_HEIGHT * SCALE_FACTOR)
+        if self.direction:
+            return pygame.Rect(self.position[0] + SPRITE_WIDTH / 4, self.position[1], SPRITE_WIDTH, SPRITE_HEIGHT * SCALE_FACTOR)
+        else:
+            return pygame.Rect(self.position[0] + SPRITE_WIDTH / 2, self.position[1], SPRITE_WIDTH, SPRITE_HEIGHT * SCALE_FACTOR)
     
     def got_hit(self):
         if not self.hit and not self.block:
@@ -226,6 +252,8 @@ class Player():
         self.moving_index = (self.moving_index + 1) % len(self.walk_frames)
         player_life = FONT.render(f"Life: {self.life}", 1, "black")
         screen.blit(player_life, (10, 10))
+        pygame.draw.rect(screen, (255, 0, 0), self.get_rect(), 2)  # Red outline with 2-pixel width
+
 
 
 

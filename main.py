@@ -17,14 +17,17 @@ main_ground = pygame.transform.scale(pygame.image.load("assets/Backgrounds/Groun
 
 FONT = pygame.font.SysFont("comicsans", 20)
 
-player = Player(x=100, y=FLOOR - 50)
-enemy = Enemy(x=WIDTH - 2 * SPRITE_WIDTH, y=HEIGHT - 130 - SPRITE_HEIGHT)
+player = Player(x=100, y=FLOOR - SPRITE_HEIGHT)
+enemy = Enemy(x=WIDTH - 2 * SPRITE_WIDTH, y=FLOOR - SPRITE_HEIGHT)
 powerups = []
 
-
+terrain = [
+    pygame.Rect(200, FLOOR - 50, 100, 20),  # Platform 1
+    pygame.Rect(400, FLOOR - 100, 100, 20),  # Platform 2
+    pygame.Rect(500, FLOOR - 150, 100, 20),  # Platform 3
+]
 
 while True: # Main loop
-
   for event in pygame.event.get():
     if event.type == pygame.QUIT:
       pygame.quit() 
@@ -45,20 +48,23 @@ while True: # Main loop
           player.life = min(player.life + 1, 10)  # Restore health, max at 10
           powerups.remove(powerup)
   
-
-
-
-  #Blits:
-  
   player.update()
   enemy.update(player.position)
+  player.on_terrain = False  # Reset at start of check
+  for rect in terrain:
+      if (rect.left <= player.get_rect().right <= rect.right or 
+          rect.left <= player.get_rect().left <= rect.right) and player.get_rect().bottom <= (rect.bottom + 10):
+                player.on_terrain = True
+                player.current_floor = rect.top - SPRITE_HEIGHT//2  # Just use the platform's top
+                break
   screen.blit(main_surface, (0, 0))
   screen.blit(main_ground, (0, HEIGHT - 130))
   player.draw(screen,FONT)
   enemy.draw(screen,FONT)
   for powerup in powerups:
     powerup.draw(screen)
-
+  for rect in terrain:
+    pygame.draw.rect(screen, (139, 69, 19), rect)  # Brown platforms
 
   # Update the frame index
   pygame.display.update()
